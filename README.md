@@ -13,7 +13,9 @@ This repo contains the source code that shows how you can integrate the **Therma
 
 After you download and install the **[ThermalLabel Web API for Docker](https://www.neodynamic.com/products/printing/thermal-label/docker/#download)** image, you must **modify the following line in the Scripts/SampleLabelEditorUI.js file** to the URL where the Docker image is available.
 
-> Neodynamic.Web.Editor.ThermalLabelEditor.websiteRootAbsoluteUrl = "http://localhost:8080";
+```js
+Neodynamic.Web.Editor.ThermalLabelEditor.websiteRootAbsoluteUrl = "http://localhost:8080";
+```
 
 Comments about some script files in this project:
 
