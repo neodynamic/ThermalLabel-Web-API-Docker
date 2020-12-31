@@ -20,7 +20,7 @@ Neodynamic.Web.Editor.ThermalLabelEditor.websiteRootAbsoluteUrl = "http://localh
 Comments about some script files in this project:
 
 - **ThermalLabelWebEditor.js** is the label editor component that provides a canvas for placing texts, barcodes, shapes, images, etc to design a label. 
-- **SampleLabelEditorUI.js** is the sample UI (you can fully customize) around the label editor component and shows you how to integrate the **ThermalLabelEditor.js** 
+- **SampleLabelEditorUI.js** is the sample UI (you can fully customize) around the label editor component and shows you how to integrate the **ThermalLabelWebEditor.js** 
 - **JSPrintManager.js** is other of our products called [JSPrintManager](https://www.neodynamic.com/products/printing/js-print-manager) that allows printing content from any website to any client printer. We use it here to provide printing functionality to the label editor.
 
 ## Licensing
