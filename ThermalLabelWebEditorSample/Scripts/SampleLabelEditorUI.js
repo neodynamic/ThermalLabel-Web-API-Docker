@@ -1,4 +1,4 @@
-﻿// Sample Label Editor UI
+// Sample Label Editor UI
 // - Referencing and Using ThermalLabelWebEditor-10.0.N.N.js
 // NOTE: You can create your own Editor UI around the ThermalLabel Web Editor Canvas 
 
@@ -23,7 +23,7 @@ var UIEditor = {
         
 
         if ($("#open_file_url").val() && $("#open_file_url").val().length > 0) {
-            $http.get($("#open_file_url").val()).
+            $.get($("#open_file_url").val()).
                 success(function (data) {
                     var tl = data[0] == '<' ? Neodynamic.SDK.Printing.ThermalLabel.createFromXmlTemplate(data) : Neodynamic.SDK.Printing.ThermalLabel.createFromJsonTemplate(data);
                     tleditor.loadThermalLabel(tl);
