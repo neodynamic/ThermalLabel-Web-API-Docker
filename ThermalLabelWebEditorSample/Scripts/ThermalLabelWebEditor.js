@@ -1,12 +1,12 @@
-/*
+﻿/*
  * ThermalLabel Web Editor Add-on
- * ThermalLabelWebEditor-10.0.21.122.js
+ * ThermalLabelWebEditor-10.0.21.505.js
  * @author Neodynamic (http://neodynamic.com/)
  * Contact: https://neodynamic.com/support
  * WebPage: https://neodynamic.com/products/printing/thermal-label/web-editor/
  */
-
-
+﻿
+﻿
 /**
  * fabric.canvasex.js
  * @author Jim Ma (https://github.com/mazong1123)
@@ -2378,14 +2378,14 @@ var Neodynamic;
                         async: true
                     }).
                         done(function (data) {
-                            _this._image_item.src = data;
-                            _this._has_to_reload = false;
-                        }).
+                        _this._image_item.src = data;
+                        _this._has_to_reload = false;
+                    }).
                         fail(function (data) {
-                            _this._fabric_item.dpi = -1;
-                            _this._image_item.src = _this._missing_image;
-                            _super.prototype._onError.call(_this, data.responseText, "BarcodeItem");
-                        });
+                        _this._fabric_item.dpi = -1;
+                        _this._image_item.src = _this._missing_image;
+                        _super.prototype._onError.call(_this, data.responseText, "BarcodeItem");
+                    });
                 };
                 ;
                 ;
@@ -3892,6 +3892,7 @@ var Neodynamic;
                     _this._source_dpi = 96;
                     _this._convert_to_monochrome = true;
                     _this._source_file = '';
+                    _this._httpPattern = /^(http:|https:)/i;
                     _this._has_to_reload = false;
                     _this._image_item = new Image();
                     _this._original_image_item = new Image();
@@ -4069,7 +4070,7 @@ var Neodynamic;
                     get: function () { return this._source_file; },
                     set: function (value) {
                         this._source_file = value;
-                        if (this._source_file && this.source_file.length > 0)
+                        if (this._source_file && this.source_file.length > 0 && !this._httpPattern.test(this.source_file))
                             this._original_image_item.src = this._missing_image;
                         this.propertyChanged();
                     },
@@ -4188,7 +4189,7 @@ var Neodynamic;
                 };
                 ImageItem.prototype.refresh = function () {
                     var _this = this;
-                    if (!this._source_base64) {
+                    if (!this._source_base64 && !this._source_file) {
                         this._image_item.src = this._missing_image;
                         this._is_missing_image = true;
                     }
@@ -4205,16 +4206,16 @@ var Neodynamic;
                             async: true
                         }).
                             done(function (data) {
-                                _this._image_item.src = data;
-                                _this._has_to_reload = false;
-                                _this._is_missing_image = false;
-                            }).
+                            _this._image_item.src = data;
+                            _this._has_to_reload = false;
+                            _this._is_missing_image = false;
+                        }).
                             fail(function (data) {
-                                _this._fabric_item.dpi = -1;
-                                _this._image_item.src = _this._missing_image;
-                                _this._is_missing_image = true;
-                                _super.prototype._onError.call(_this, data.responseText, "ImageItem");
-                            });
+                            _this._fabric_item.dpi = -1;
+                            _this._image_item.src = _this._missing_image;
+                            _this._is_missing_image = true;
+                            _super.prototype._onError.call(_this, data.responseText, "ImageItem");
+                        });
                     }
                     this._updateToCanvas();
                     this._has_to_reload = false;
@@ -5343,17 +5344,17 @@ var Neodynamic;
                         async: true
                     }).
                         done(function (data) {
-                            _this._image_item.src = data;
-                            _this._has_to_reload = false;
-                            if (_this._fabric_item.canvas) {
-                                _this._fabric_item.canvas.renderAll();
-                            }
-                        }).
+                        _this._image_item.src = data;
+                        _this._has_to_reload = false;
+                        if (_this._fabric_item.canvas) {
+                            _this._fabric_item.canvas.renderAll();
+                        }
+                    }).
                         fail(function (data) {
-                            _this._fabric_item.dpi = -1;
-                            _this._image_item.src = _this._missing_image;
-                            _super.prototype._onError.call(_this, data.responseText, "TextItem");
-                        });
+                        _this._fabric_item.dpi = -1;
+                        _this._image_item.src = _this._missing_image;
+                        _super.prototype._onError.call(_this, data.responseText, "TextItem");
+                    });
                 };
                 TextItem.prototype._getProperties = function () {
                     return {
@@ -5444,10 +5445,8 @@ var Neodynamic;
                     zoomY = (zoomY > 1 ? zoomY : 1);
                     var editCtrl;
                     if (this.input_mask_pattern && this.input_mask_pattern.length > 0) {
-                        editCtrl = $('<input type="text" >').focusout(function (i) { _this._onEditCtrlLostFocus(editCtrl); }).keyup(function (e) {
-                            if (e.which == 27)
-                                _this._onEditCtrlLostFocus(editCtrl);
-                        });
+                        editCtrl = $('<input type="text" >').focusout(function (i) { _this._onEditCtrlLostFocus(editCtrl); }).keyup(function (e) { if (e.which == 27)
+                            _this._onEditCtrlLostFocus(editCtrl); });
                         var mask = this.input_mask_pattern;
                         var promptChar = this.input_mask_prompt_char;
                         editCtrl[0].addEventListener('input', function () {
@@ -5457,10 +5456,8 @@ var Neodynamic;
                         Neodynamic.Web.Utils.MaskEditUtils.masking(editCtrl[0], mask, promptChar);
                     }
                     else {
-                        editCtrl = $('<textarea maxlength="' + (this.max_length > 0 ? this.max_length : '') + '"></textarea>').focusout(function (i) { _this._onEditCtrlLostFocus(editCtrl); }).keyup(function (e) {
-                            if (e.which == 27)
-                                _this._onEditCtrlLostFocus(editCtrl);
-                        });
+                        editCtrl = $('<textarea maxlength="' + (this.max_length > 0 ? this.max_length : '') + '"></textarea>').focusout(function (i) { _this._onEditCtrlLostFocus(editCtrl); }).keyup(function (e) { if (e.which == 27)
+                            _this._onEditCtrlLostFocus(editCtrl); });
                         $(editCtrl).text(this.text);
                     }
                     $(editCtrl).css("position", "absolute").css("width", this._width * zoomX).css("height", this._height * zoomY).
@@ -6521,29 +6518,29 @@ var Neodynamic;
                         on('mouse:move', function (object) { self._canvasMouseMove(object); }).
                         on('mouse:up', function (object) { self._canvasMouseUp(object); }).
                         on('mouse:over', function (e) {
-                            self._itemToolTipOverCount++;
-                            var offsetX = self._tlweCanvas.offsetParent.offsetLeft;
-                            var offsetY = self._tlweCanvas.offsetParent.offsetTop;
-                            var itemTypeName = e.target.thermal_label_object.constructor.name.replace("Item", "").replace("Shape", "");
-                            var info = "";
-                            if (e.target.thermal_label_object.name) {
-                                info += "<strong>" + e.target.thermal_label_object.name + "</strong>";
-                            }
-                            if (info.length > 0)
-                                info += " ";
-                            info += "[" + itemTypeName + "]";
-                            if (itemTypeName == "Barcode") {
-                                info += " <em>" + Neodynamic.SDK.Printing.BarcodeSymbology[e.target.thermal_label_object.symbology] + "</em>";
-                            }
-                            $(self._itemToolTip).html("<span>" + info + "</span>");
-                            self.updateItemTooltip(offsetX + e.target.left, offsetY + e.target.top - 26);
-                        }).
+                        self._itemToolTipOverCount++;
+                        var offsetX = self._tlweCanvas.offsetParent.offsetLeft;
+                        var offsetY = self._tlweCanvas.offsetParent.offsetTop;
+                        var itemTypeName = e.target.thermal_label_object.constructor.name.replace("Item", "").replace("Shape", "");
+                        var info = "";
+                        if (e.target.thermal_label_object.name) {
+                            info += "<strong>" + e.target.thermal_label_object.name + "</strong>";
+                        }
+                        if (info.length > 0)
+                            info += " ";
+                        info += "[" + itemTypeName + "]";
+                        if (itemTypeName == "Barcode") {
+                            info += " <em>" + Neodynamic.SDK.Printing.BarcodeSymbology[e.target.thermal_label_object.symbology] + "</em>";
+                        }
+                        $(self._itemToolTip).html("<span>" + info + "</span>");
+                        self.updateItemTooltip(offsetX + e.target.left, offsetY + e.target.top - 26);
+                    }).
                         on('mouse:out', function (e) {
-                            if (!e.target || self._itemToolTipOverCount == 1) {
-                                self.hideItemTooltip();
-                            }
-                            self._itemToolTipOverCount = 0;
-                        });
+                        if (!e.target || self._itemToolTipOverCount == 1) {
+                            self.hideItemTooltip();
+                        }
+                        self._itemToolTipOverCount = 0;
+                    });
                     this._tlweBackgroundCanvasFabric = new fabric.StaticCanvas(self._tlweBackgroundCanvas, { backgroundColor: self.getStyleValue("--label-document-frame-background-color") });
                     this._centerCanvas();
                     this._tlweCanvas.getContext('2d').imageSmoothingEnabled = false;
@@ -7008,28 +7005,28 @@ var Neodynamic;
                         async: false
                     }).
                         done(function (data) {
-                            var tlweURL = rootUrl + "/" + ThermalLabelEditor.thermalLabelWebEditorControllerName + "?webPrintJob=t&LabelID=" + data;
-                            if (custom_url) {
-                                tlweURL = custom_url + (custom_url.indexOf('?') > 0 ? "&" : "?") + "webPrintJob=t&LabelID=" + data;
-                            }
-                            var e_id = 'id_' + new Date().getTime();
-                            if (window['chrome']) {
-                                $('body').append('<a id="' + e_id + '"></a>');
-                                $('#' + e_id).attr('href', 'tlprint:' + tlweURL);
-                                var a = $('a#' + e_id)[0];
-                                var evObj = document.createEvent('MouseEvents');
-                                evObj.initEvent('click', true, true);
-                                a.dispatchEvent(evObj);
-                            }
-                            else {
-                                $('body').append('<iframe name="' + e_id + '" id="' + e_id + '" width="1" height="1" style="visibility:hidden;position:absolute" />');
-                                $('#' + e_id).attr('src', 'tlprint:' + tlweURL);
-                            }
-                            setTimeout(function () { $('#' + e_id).remove(); }, 5000);
-                        }).
+                        var tlweURL = rootUrl + "/" + ThermalLabelEditor.thermalLabelWebEditorControllerName + "?webPrintJob=t&LabelID=" + data;
+                        if (custom_url) {
+                            tlweURL = custom_url + (custom_url.indexOf('?') > 0 ? "&" : "?") + "webPrintJob=t&LabelID=" + data;
+                        }
+                        var e_id = 'id_' + new Date().getTime();
+                        if (window['chrome']) {
+                            $('body').append('<a id="' + e_id + '"></a>');
+                            $('#' + e_id).attr('href', 'tlprint:' + tlweURL);
+                            var a = $('a#' + e_id)[0];
+                            var evObj = document.createEvent('MouseEvents');
+                            evObj.initEvent('click', true, true);
+                            a.dispatchEvent(evObj);
+                        }
+                        else {
+                            $('body').append('<iframe name="' + e_id + '" id="' + e_id + '" width="1" height="1" style="visibility:hidden;position:absolute" />');
+                            $('#' + e_id).attr('src', 'tlprint:' + tlweURL);
+                        }
+                        setTimeout(function () { $('#' + e_id).remove(); }, 5000);
+                    }).
                         fail(function (data) {
-                            _this._onError("print: " + data.responseText, "ThermalLabelEditor");
-                        });
+                        _this._onError("print: " + data.responseText, "ThermalLabelEditor");
+                    });
                 };
                 ThermalLabelEditor.prototype._getLabelTemplate = function (custom_url, format, callback) {
                     var _this = this;
@@ -7056,8 +7053,8 @@ var Neodynamic;
                         }
                     }).
                         fail(function (data) {
-                            _this._onError(action + ": " + data.responseText, "ThermalLabelEditor");
-                        });
+                        _this._onError(action + ": " + data.responseText, "ThermalLabelEditor");
+                    });
                     if (!callback)
                         return labelTemplate;
                 };
@@ -7090,8 +7087,8 @@ var Neodynamic;
                         }
                     }).
                         fail(function (data) {
-                            _this._onError("getSupportedExpressions: " + data.responseText, "ThermalLabelEditor");
-                        });
+                        _this._onError("getSupportedExpressions: " + data.responseText, "ThermalLabelEditor");
+                    });
                     if (!callback)
                         return supportedExpressions;
                 };
@@ -7122,8 +7119,8 @@ var Neodynamic;
                         }
                     }).
                         fail(function (data) {
-                            _this._onError("getLabelPreview: " + data.responseText, "ThermalLabelEditor");
-                        });
+                        _this._onError("getLabelPreview: " + data.responseText, "ThermalLabelEditor");
+                    });
                     if (!callback)
                         return labelPreview;
                 };
@@ -7150,8 +7147,8 @@ var Neodynamic;
                         }
                     }).
                         fail(function (data) {
-                            _this._onError("getLabelThumbnail: " + data.responseText, "ThermalLabelEditor");
-                        });
+                        _this._onError("getLabelThumbnail: " + data.responseText, "ThermalLabelEditor");
+                    });
                     if (!callback)
                         return labelThumbnail;
                 };
