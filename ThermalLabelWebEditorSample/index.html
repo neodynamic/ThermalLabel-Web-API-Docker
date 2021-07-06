@@ -832,42 +832,49 @@
                 </div>
             </div>
         </div>
-    </div>
 
 
-    <script src="Scripts/fabric-1.5.0.js"></script>
-    <script src="Scripts/ThermalLabelWebEditor.js"></script>
-    <script src="Scripts/neoPropGrid.js"></script>
-    <script src="Scripts/ExprBuilder.js"></script>
-    <script src="Scripts/Gallery.js"></script>
-    <script src="Scripts/SampleLabelEditorUI.js"></script>
-    <!--JSPrintManager scripts-->
-    <script src="scripts/JSPrintManager.js"></script>
-    <script src="scripts/zip.js"></script>
-    <script src="scripts/zip-ext.js"></script>
-    <script src="scripts/deflate.js"></script>
-    <script src="Scripts/printing.js"></script>
-    <!--end JSPrintManager scripts-->
-    <script type="text/javascript">
-        $(function () {
-            function endSession() {
-                $('#sessionExpired').modal('show');
-            }
-            setTimeout(endSession, 900000); //15 min
-            var os = (function () {
-                var ua = navigator.userAgent.toLowerCase();
-                return {
-                    isWindows: /(windows|win32|win64)/.test(ua),
-                    isLinux: /(linux)/.test(ua),
-                    isIntelMac: /(intel mac)/.test(ua),
-                    isAndroid: /(android)/.test(ua)
-                };
-            }());
-            if (os.isLinux || os.isIntelMac || os.isAndroid) {
-                $('#tlbPrint').hide();
-            }
-        });
-    </script>
+
+        <script src="Scripts/fabric-1.5.0.js"></script>
+        <script src="Scripts/ThermalLabelWebEditor.js"></script>
+        <script src="Scripts/neoPropGrid.js"></script>
+        <script src="Scripts/ExprBuilder.js"></script>
+        <script src="Scripts/Gallery.js"></script>
+        <script src="Scripts/SampleLabelEditorUI.js"></script>
+
+        <!--JSPrintManager scripts-->
+        <script src="scripts/JSPrintManager.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/gildas-lormeau/zip.js/dist/zip-full.min.js"></script>
+
+        <script src="Scripts/printing.js"></script>
+        <!--end JSPrintManager scripts-->
+
+        <script type="text/javascript">
+
+            $(function () {
+                function endSession() {
+                    $('#sessionExpired').modal('show');
+                }
+                setTimeout(endSession, 900000); //15 min
+
+                var os = (function () {
+                    var ua = navigator.userAgent.toLowerCase();
+                    return {
+                        isWindows: /(windows|win32|win64)/.test(ua),
+                        isLinux: /(linux)/.test(ua),
+                        isIntelMac: /(intel mac)/.test(ua),
+                        isAndroid: /(android)/.test(ua)
+                    };
+                }());
+
+                if (os.isLinux || os.isIntelMac || os.isAndroid) {
+                    $('#tlbPrint').hide();
+                }
+
+            });
+
+
+        </script>
 </body>
 
 </html>

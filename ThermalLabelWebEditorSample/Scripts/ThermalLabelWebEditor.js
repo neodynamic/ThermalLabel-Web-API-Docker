@@ -1,6 +1,6 @@
 ﻿/*
  * ThermalLabel Web Editor Add-on
- * ThermalLabelWebEditor-10.0.21.505.js
+ * ThermalLabelWebEditor-10.0.21.702.js
  * @author Neodynamic (http://neodynamic.com/)
  * Contact: https://neodynamic.com/support
  * WebPage: https://neodynamic.com/products/printing/thermal-label/web-editor/
@@ -5418,7 +5418,7 @@ var Neodynamic;
                         ForeColorHex: this.fore_color_hex,
                         InputMaskPattern: this.input_mask_pattern,
                         InputMaskPromptChar: this.input_mask_prompt_char,
-                        Expression: this.expression,
+                        Expression: Neodynamic.Web.Utils.NamingUtils.convertXMLUCS2ToChar(this.expression),
                         UseCache: this.use_cache,
                         CacheItemId: this.cache_item_id,
                         StrokeThickness: this.stroke_thickness,
@@ -7877,7 +7877,10 @@ var Neodynamic;
                 NamingUtils.convertXMLUCS2ToChar = function (text) {
                     return text.replace(/_x(([A-F]|[a-f]|[0-9]){4})_/g, function (x, x1) {
                         return String.fromCharCode(parseInt(x1, 16));
-                    });
+                    }).replace(/\"/g, '_x0022_').replace(/&#34;/g, '_x0022_')
+                        .replace(/</g, '_x003c_').replace(/&#60;/g, '_x003c_')
+                        .replace(/>/g, '_x003e_').replace(/&#62;/g, '_x003e_')
+                        .replace(/&/g, '_x0026_').replace(/&#38;/g, '_x0026_');
                 };
                 NamingUtils.newGuid = function () {
                     function s4() {
@@ -8105,7 +8108,7 @@ var Neodynamic;
                         if (json.strokecolorhex != null)
                             e.stroke_color_hex = json.strokecolorhex;
                         if (json.expression != null)
-                            e.expression = json.expression;
+                            e.expression = Neodynamic.Web.Utils.NamingUtils.convertXMLUCS2ToChar(json.expression);
                         if (json.usecache != null)
                             e.use_cache = json.usecache;
                         if (json.cacheitemid != null)
@@ -8154,7 +8157,7 @@ var Neodynamic;
                         if (json.strokecolorhex != null)
                             e.stroke_color_hex = json.strokecolorhex;
                         if (json.expression != null)
-                            e.expression = json.expression;
+                            e.expression = Neodynamic.Web.Utils.NamingUtils.convertXMLUCS2ToChar(json.expression);
                         if (json.usecache != null)
                             e.use_cache = json.usecache;
                         if (json.cacheitemid != null)
@@ -8487,7 +8490,7 @@ var Neodynamic;
                         if (json.textforecolorhex != null)
                             e.text_fore_color_hex = json.textforecolorhex;
                         if (json.expression != null)
-                            e.expression = json.expression;
+                            e.expression = Neodynamic.Web.Utils.NamingUtils.convertXMLUCS2ToChar(json.expression);
                         if (json.usecache != null)
                             e.use_cache = json.usecache;
                         if (json.cacheitemid != null)
@@ -8569,7 +8572,7 @@ var Neodynamic;
                         if (json.converttomonochrome != null)
                             e.convert_to_monochrome = json.converttomonochrome;
                         if (json.expression != null)
-                            e.expression = json.expression;
+                            e.expression = Neodynamic.Web.Utils.NamingUtils.convertXMLUCS2ToChar(json.expression);
                         if (json.usecache != null)
                             e.use_cache = json.usecache;
                         if (json.cacheitemid != null)
@@ -8614,7 +8617,7 @@ var Neodynamic;
                         if (json.strokecolorhex != null)
                             e.stroke_color_hex = json.strokecolorhex;
                         if (json.expression != null)
-                            e.expression = json.expression;
+                            e.expression = Neodynamic.Web.Utils.NamingUtils.convertXMLUCS2ToChar(json.expression);
                         if (json.usecache != null)
                             e.use_cache = json.usecache;
                         if (json.cacheitemid != null)
@@ -8717,7 +8720,7 @@ var Neodynamic;
                         if (json.forecolorhex != null)
                             e.fore_color_hex = json.forecolorhex;
                         if (json.expression != null)
-                            e.expression = json.expression;
+                            e.expression = Neodynamic.Web.Utils.NamingUtils.convertXMLUCS2ToChar(json.expression);
                         if (json.inputmaskpattern != null)
                             e.input_mask_pattern = json.inputmaskpattern;
                         if (json.inputmaskpromptchar != null)
@@ -8734,6 +8737,8 @@ var Neodynamic;
                             e.stroke_color_hex = json.strokecolorhex;
                         if (json.charspacing != null)
                             e.char_spacing = json.charspacing;
+                        if (json.hideifempty != null)
+                            e.hide_if_empty = json.hideifempty;
                         return e;
                     }
                     if (type == "RFIDTagItem") {
@@ -8766,7 +8771,7 @@ var Neodynamic;
                         if (json.editable != null)
                             e.editable = json.editable;
                         if (json.expression != null)
-                            e.expression = json.expression;
+                            e.expression = Neodynamic.Web.Utils.NamingUtils.convertXMLUCS2ToChar(json.expression);
                         if (json.usecache != null)
                             e.use_cache = json.usecache;
                         if (json.cacheitemid != null)

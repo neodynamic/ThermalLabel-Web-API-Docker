@@ -1,4 +1,4 @@
-// Sample Label Editor UI
+﻿// Sample Label Editor UI
 // - Referencing and Using ThermalLabelWebEditor-10.0.N.N.js
 // NOTE: You can create your own Editor UI around the ThermalLabel Web Editor Canvas 
 
@@ -339,7 +339,7 @@ var UIEditor = {
 //Create a ThermalLabelEditor instance
 var tleditor = new Neodynamic.Web.Editor.ThermalLabelEditor("#tle-container");
 //Set the label web editor controller
-Neodynamic.Web.Editor.ThermalLabelEditor.websiteRootAbsoluteUrl = "https://localhost:8080"; // THE DOCKER IMAGE - CHANGE THIS TO MATCH YOUR SETTING
+Neodynamic.Web.Editor.ThermalLabelEditor.websiteRootAbsoluteUrl = "https://localhost:44345"; // THE DOCKER IMAGE - CHANGE THIS TO MATCH YOUR SETTING
 Neodynamic.Web.Editor.ThermalLabelEditor.thermalLabelWebEditorControllerName = "ThermalLabelEditor"; // FIXED DO NOT CHANGE THIS!!!
 
 //editor canvas settings
@@ -391,8 +391,8 @@ window.addEventListener('keydown', function (e) {
 
     if (e.keyCode === ctrlKey || e.keyCode === cmdKey) ctrlDown = true;
     if (e.keyCode === shiftKey) shiftDown = true;
+    var selectionAndFocused = (document.activeElement === document.body && tleditor.current_selection);
 
-    
     var textItemInEditMode = (tleditor.current_selection instanceof Neodynamic.SDK.Printing.TextItem && tleditor.current_selection.is_in_edit_mode);
 
     if (textItemInEditMode === false) {
@@ -416,10 +416,10 @@ window.addEventListener('keydown', function (e) {
             e.preventDefault();
             return false;
         }
-        else if (e.keyCode === 46) { //DEL key
+        else if (e.keyCode === 46 && selectionAndFocused) { //DEL key
             tleditor.deleteSelectedItems();
         }
-        else if (e.keyCode >= 37 && e.keyCode <= 40) { //Move item by arrow keys
+        else if (e.keyCode >= 37 && e.keyCode <= 40 && selectionAndFocused) { //Move item by arrow keys
             var moveLargeStep = 10; //in pixel unit
             var moveShortStep = 1; //in pixel unit
 
@@ -444,9 +444,8 @@ window.addEventListener('keydown', function (e) {
             return false;
         }
     }
-    
-}, false);
 
+}, false);
 
 setInterval(function myTimer() {
     if (tleditor) {
