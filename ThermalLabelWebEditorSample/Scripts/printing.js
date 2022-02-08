@@ -189,7 +189,7 @@ function jspmPrint() {
                     // set file or raw commands?
                     if (self.acceptHeader == "application/pdf") {
                         // set pdf file
-                        var my_file = new JSPM.PrintFilePDF(new Blob([xhr.response]), JSPM.FileSourceType.BLOB, 'MyLabel.pdf', 1);
+                        var my_file = new JSPM.PrintFilePDF(xhr.response, JSPM.FileSourceType.BLOB, 'MyLabel.pdf', 1);
                         //my_file.pageSizing = JSPM.Sizing.Fit;
 
                         cpj.files.push(my_file);
