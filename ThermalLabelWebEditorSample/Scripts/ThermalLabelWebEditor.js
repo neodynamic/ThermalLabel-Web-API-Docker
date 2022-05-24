@@ -1,6 +1,6 @@
 ﻿/*
  * ThermalLabel Web Editor Add-on
- * ThermalLabelWebEditor-11.0.0.0.js
+ * ThermalLabelWebEditor-11.0.22.504.js
  * @author Neodynamic (http://neodynamic.com/)
  * Contact: https://neodynamic.com/support
  * WebPage: https://neodynamic.com/products/printing/thermal-label/web-editor/
@@ -2452,8 +2452,15 @@ var Neodynamic;
                         async: true
                     }).
                         done(function (data) {
-                        _this._image_item.src = data;
-                        _this._has_to_reload = false;
+                        if (data.startsWith("ERROR")) {
+                            _this._fabric_item.dpi = -1;
+                            _this._image_item.src = _this._missing_image;
+                            _super.prototype._onError.call(_this, data, "BarcodeItem");
+                        }
+                        else {
+                            _this._image_item.src = data;
+                            _this._has_to_reload = false;
+                        }
                     }).
                         fail(function (data) {
                         _this._fabric_item.dpi = -1;
@@ -4226,9 +4233,17 @@ var Neodynamic;
                             async: true
                         }).
                             done(function (data) {
-                            _this._image_item.src = data;
-                            _this._has_to_reload = false;
-                            _this._is_missing_image = false;
+                            if (data.startsWith("ERROR")) {
+                                _this._fabric_item.dpi = -1;
+                                _this._image_item.src = _this._missing_image;
+                                _this._is_missing_image = true;
+                                _super.prototype._onError.call(_this, data, "ImageItem");
+                            }
+                            else {
+                                _this._image_item.src = data;
+                                _this._has_to_reload = false;
+                                _this._is_missing_image = false;
+                            }
                         }).
                             fail(function (data) {
                             _this._fabric_item.dpi = -1;
@@ -5564,8 +5579,15 @@ var Neodynamic;
                         async: true
                     }).
                         done(function (data) {
-                        _this._image_item.src = data;
-                        _this._has_to_reload = false;
+                        if (data.startsWith("ERROR")) {
+                            _this._fabric_item.dpi = -1;
+                            _this._image_item.src = _this._missing_image;
+                            _super.prototype._onError.call(_this, data, "TextItem");
+                        }
+                        else {
+                            _this._image_item.src = data;
+                            _this._has_to_reload = false;
+                        }
                         if (_this._fabric_item.canvas) {
                             _this._fabric_item.canvas.renderAll();
                         }
@@ -7070,9 +7092,10 @@ var Neodynamic;
                     this._selObjLT.y = options.target.oCoords.tl.y;
                     if (options.target.thermal_label_object && options.target.thermal_label_object.group_name && options.target.thermal_label_object.group_name.trim() != '') {
                         var self = this;
-                        var gn = options.target.thermal_label_object.group_name;
+                        var gn = options.target.thermal_label_object.group_name.trim();
                         this._tlweCanvasFabric.getObjects().map(function (obj) {
                             if (obj.thermal_label_object &&
+                                gn != '' &&
                                 obj.thermal_label_object.group_name == gn &&
                                 obj.thermal_label_object._guid != options.target.thermal_label_object._guid &&
                                 obj.thermal_label_object.editable &&
@@ -7122,9 +7145,10 @@ var Neodynamic;
                     var self = this;
                     if (options.target.thermal_label_object && options.target.thermal_label_object.group_name && options.target.thermal_label_object.group_name.trim() != '') {
                         var da = options.target.angle - (options.target.thermal_label_object._rotation_angle != null ? options.target.thermal_label_object._rotation_angle : 0);
-                        var gn = options.target.thermal_label_object.group_name;
+                        var gn = options.target.thermal_label_object.group_name.trim();
                         this._tlweCanvasFabric.getObjects().map(function (obj) {
                             if (obj.thermal_label_object &&
+                                gn != '' &&
                                 obj.thermal_label_object.group_name == gn &&
                                 obj.thermal_label_object._guid != options.target.thermal_label_object._guid &&
                                 obj.thermal_label_object.editable &&
@@ -7153,9 +7177,10 @@ var Neodynamic;
                     if (options.target.thermal_label_object && options.target.thermal_label_object.group_name && options.target.thermal_label_object.group_name.trim() != '') {
                         var dl = options.e.movementX;
                         var dt = options.e.movementY;
-                        var gn = options.target.thermal_label_object.group_name;
+                        var gn = options.target.thermal_label_object.group_name.trim();
                         this._tlweCanvasFabric.getObjects().map(function (obj) {
                             if (obj.thermal_label_object &&
+                                gn != '' &&
                                 obj.thermal_label_object.group_name == gn &&
                                 obj.thermal_label_object._guid != options.target.thermal_label_object._guid &&
                                 obj.thermal_label_object.editable &&
@@ -7490,12 +7515,13 @@ var Neodynamic;
                     var cancel = !this.currentSelectionBeforeDelete();
                     if (!cancel) {
                         var object = this._tlweCanvasFabric.getActiveObject();
-                        var gn = object.thermal_label_object.group_name;
+                        var gn = object.thermal_label_object.group_name.trim();
                         this._tl.items.splice(this._tl.items.indexOf(object.thermal_label_object), 1);
                         object.remove();
                         var self = this;
                         this._tlweCanvasFabric.getObjects().map(function (obj) {
                             if (obj.thermal_label_object &&
+                                gn != '' &&
                                 obj.thermal_label_object.group_name == gn &&
                                 obj.thermal_label_object.editable &&
                                 obj.thermal_label_object.visible) {
@@ -7768,10 +7794,18 @@ var Neodynamic;
                 };
                 ThermalLabelEditor.prototype.clipboardPaste = function () {
                     if (this._clipboardBuffer && this._clipboardBuffer.length > 0) {
+                        var groups = {};
                         for (var i = 0; i < this._clipboardBuffer.length; i++) {
                             var itm = this._objFromCut ? this._clipboardBuffer[i] : Neodynamic.Web.Utils.Cloner.cloneItem(this._clipboardBuffer[i]);
-                            if (!this._objFromCut)
+                            if (!this._objFromCut) {
+                                if (itm.group_name && itm.group_name.trim() != '') {
+                                    if (!groups[itm.group_name]) {
+                                        groups[itm.group_name] = 'G' + Date.now();
+                                    }
+                                    itm.group_name = groups[itm.group_name];
+                                }
                                 itm._updateToCanvas();
+                            }
                             var UnitUtils = Neodynamic.Web.Utils.UnitUtils;
                             var curUnit = this._tl.unit_type;
                             itm.x += UnitUtils.convertPixelToUnit(10 * this._pasteCounter, curUnit);
@@ -7793,11 +7827,12 @@ var Neodynamic;
                     }
                 };
                 ThermalLabelEditor.prototype.moveSelectedItems = function (deltaX, deltaY) {
-                    var gn = this.current_selection.group_name;
+                    var gn = this.current_selection.group_name.trim();
                     if (gn && gn.length > 0) {
                         var f = false;
                         this._tlweCanvasFabric.getObjects().map(function (obj) {
                             if (obj.thermal_label_object &&
+                                gn != '' &&
                                 obj.thermal_label_object.group_name == gn &&
                                 obj.thermal_label_object.editable &&
                                 obj.thermal_label_object.visible) {
@@ -7948,9 +7983,10 @@ var Neodynamic;
                 ThermalLabelEditor.prototype.unGroup = function () {
                     if (!this._isGrouping && this.current_selection) {
                         var self = this;
-                        var gn = this.current_selection.group_name;
+                        var gn = this.current_selection.group_name.trim();
                         this._tlweCanvasFabric.getObjects().map(function (obj) {
                             if (obj.thermal_label_object &&
+                                gn != '' &&
                                 obj.thermal_label_object.group_name == gn) {
                                 obj.thermal_label_object.group_name = '';
                             }
