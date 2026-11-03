@@ -1,14 +1,13 @@
 // =====================================================================
-// PrintDialogs.js
-// Print method chooser + advanced client printing via JSPrintManager,
-// converting the label with the ThermalLabel Web API (POST /ThermalLabel/Convert)
+// PrintDialogs.Api.js
+// Client printing via JSPrintManager (Windows, macOS, Linux, Raspberry Pi),
+// converting the label with the ThermalLabel Web API (POST /ThermalLabel/Convert).
+// TLClientPrint (the editor's built-in Windows-only printing) is not used:
+// it is not supported by the Web API version of the SDK.
 //
-//  - #print-dialog       : lets the user pick the printing method
-//      * Standard  -> UIEditor.doPrinting()  (TLClientPrint, Windows only)
-//      * Advanced  -> #jspm-print-dialog      (JSPrintManager, any OS)
-//  - #jspm-print-dialog  : JSPM printer settings + print job
+//  - #print-dialog : JSPM printer settings + print job (opened by PrintDialogs.open())
 //
-// Conversion flow (Advanced):
+// Conversion flow:
 //   tleditor.getJsonTemplate()  ->  POST {apiBaseUrl}/ThermalLabel/Convert
 //      Accept: application/vnd.zpl | vnd.epl | vnd.fingerprint | vnd.escpos  -> raw bytes
 //      Accept: application/pdf                                               -> PDF file
@@ -30,7 +29,6 @@
 
 var PrintDialogs = (function () {
 
-    var STORAGE_KEY = 'tlwe.printMethod';
     var CONVERT_PATH = '/ThermalLabel/Convert';
 
     var cfg = $.extend({
@@ -46,7 +44,6 @@ var PrintDialogs = (function () {
         zpl: 'application/vnd.zpl',
         epl: 'application/vnd.epl',
         fingerprint: 'application/vnd.fingerprint',
-        dp: 'application/vnd.dp',
         escpos: 'application/vnd.escpos'
     };
 
@@ -65,20 +62,8 @@ var PrintDialogs = (function () {
     // Helpers
     // ------------------------------------------------------------------
 
-    function isWindows() {
-        return /(windows|win32|win64)/i.test(navigator.userAgent);
-    }
-
     function jspmAvailable() {
         return typeof window.JSPM !== 'undefined' && JSPM.JSPrintManager;
-    }
-
-    function readSavedMethod() {
-        try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
-    }
-
-    function saveMethod(m) {
-        try { localStorage.setItem(STORAGE_KEY, m); } catch (e) { /* storage unavailable */ }
     }
 
     function apiConvertUrl() {
@@ -164,20 +149,8 @@ var PrintDialogs = (function () {
     }
 
     // ------------------------------------------------------------------
-    // Step 1: method chooser (#print-dialog)
+    // JSPrintManager print dialog (#print-dialog)
     // ------------------------------------------------------------------
-
-    function selectMethod(method) {
-        $('#print-method-options .print-option').each(function () {
-            var on = $(this).data('method') === method;
-            $(this).toggleClass('active', on).attr('aria-checked', on ? 'true' : 'false');
-        });
-        $('#btnPrintMethodContinue').prop('disabled', !method);
-    }
-
-    function selectedMethod() {
-        return $('#print-method-options .print-option.active').data('method') || null;
-    }
 
     function open() {
         if (!tleditor.get_thermal_label) {
@@ -185,41 +158,6 @@ var PrintDialogs = (function () {
             return;
         }
 
-        var win = isWindows();
-        var $std = $('#print-method-options .print-option[data-method="standard"]');
-        $std.prop('disabled', !win).toggleClass('disabled', !win);
-        $('#printStdNotSupported').toggle(!win);
-
-        var method = readSavedMethod();
-        if (!win || (method !== 'standard' && method !== 'jspm')) method = win ? 'standard' : 'jspm';
-        selectMethod(method);
-
-        $('#print-dialog').modal('show');
-    }
-
-    function continueWithMethod() {
-        var method = selectedMethod();
-        if (!method) return;
-        saveMethod(method);
-
-        if (method === 'standard') {
-            $('#print-dialog').modal('hide');
-            UIEditor.doPrinting();
-            return;
-        }
-
-        // Advanced: open the JSPM dialog once the chooser is fully hidden
-        // (Bootstrap 3 does not support stacked modals well)
-        $('#print-dialog').one('hidden.bs.modal', function () {
-            openJspmDialog();
-        }).modal('hide');
-    }
-
-    // ------------------------------------------------------------------
-    // Step 2: JSPrintManager dialog (#jspm-print-dialog)
-    // ------------------------------------------------------------------
-
-    function openJspmDialog() {
         $('#jspmError').hide();
         setBusy(false);
 
@@ -228,11 +166,11 @@ var PrintDialogs = (function () {
             $('#btnStartPrint').hide();
             $('#jspmInfo').show();
             $('#jspmInfoReason').text('JSPrintManager.js script is not loaded in this page.');
-            $('#jspm-print-dialog').modal('show');
+            $('#print-dialog').modal('show');
             return;
         }
 
-        $('#jspm-print-dialog').modal('show');
+        $('#print-dialog').modal('show');
 
         if (!jspmStarted) {
             startJspm();
@@ -409,7 +347,7 @@ var PrintDialogs = (function () {
             .then(function (buffer) {
                 sendJob(s, buffer);
                 setBusy(false);
-                $('#jspm-print-dialog').modal('hide');
+                $('#print-dialog').modal('hide');
             })
             .catch(function (err) {
                 setBusy(false);
@@ -425,23 +363,11 @@ var PrintDialogs = (function () {
         var icon = (window.gallery && gallery.getProgressIcon) ? gallery.getProgressIcon() : '';
         $('#imgInstPrintersWait, #imgSerPortsWait, #imgJspmConnecting').attr('src', icon);
 
-        $('#print-method-options').on('click', '.print-option:not(.disabled)', function () {
-            selectMethod($(this).data('method'));
-        });
-        $('#print-method-options').on('dblclick', '.print-option:not(.disabled)', function () {
-            selectMethod($(this).data('method'));
-            continueWithMethod();
-        });
-        $('#btnPrintMethodContinue').on('click', continueWithMethod);
-
         $('#btnStartPrint').on('click', print);
         // getJsonTemplate failures are reported by tleditor.onError (#error-dialog) and its
         // callback never runs, so release the Print button when that happens
         $('#error-dialog').on('show.bs.modal', function () { if (busy) setBusy(false); });
 
-        $('#btnJspmBack').on('click', function () {
-            $('#jspm-print-dialog').one('hidden.bs.modal', open).modal('hide');
-        });
         $('#btnJspmRetry').on('click', function () {
             if (!jspmAvailable()) return;
             $('#jspmInfo').hide();
@@ -461,5 +387,5 @@ var PrintDialogs = (function () {
 
     $(init);
 
-    return { open: open, openAdvanced: openJspmDialog, config: cfg };
+    return { open: open, config: cfg };
 })();

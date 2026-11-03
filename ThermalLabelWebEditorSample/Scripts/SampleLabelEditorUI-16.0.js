@@ -518,14 +518,7 @@ var UIEditor = {
 
         }
     },
-
-    doPrinting: function () {
-        if (tleditor.get_thermal_label) {
-            var ds = UIEditor.getDataSource();
-            tleditor.print(null, ds.dataSourceFormat, ds.dataSource);
-        }
-    },
-
+    
     editGlobalExpressions: function () {
         if (tleditor.get_thermal_label) {
 
@@ -868,6 +861,8 @@ var tleditor = new Neodynamic.Web.Editor.ThermalLabelEditor("#tle-container");
 //Set the label web editor controller
 Neodynamic.Web.Editor.ThermalLabelEditor.websiteRootAbsoluteUrl = "http://localhost:8080"; // THE DOCKER IMAGE - CHANGE THIS TO MATCH YOUR SETTING
 Neodynamic.Web.Editor.ThermalLabelEditor.thermalLabelWebEditorControllerName = "ThermalLabelEditor"; // FIXED DO NOT CHANGE THIS!!!
+
+
 
 //editor canvas settings
 tleditor.rfid_tag_image_file_name = 'images/icons/RFIDTag.png';
